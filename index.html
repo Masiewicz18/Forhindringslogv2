@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plus Pack – Forhindringslog (QR)</title>
+
+  <style>
+    :root{
+      --bg0:#f6f8ff; --bg1:#eef4ff;
+      --card: rgba(255,255,255,.78);
+      --text:#0b1324; --muted:#5b6b86; --muted2:#7d8aa3;
+      --accent:#2563eb; --accent2:#14b8a6; --danger:#ef4444;
+      --border: rgba(15, 23, 42, .10);
+      --shadow: 0 14px 40px rgba(15, 23, 42, .10);
+      --radius: 18px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family:var(--font); color:var(--text); padding: 26px 14px;
+      background:
+        radial-gradient(900px 500px at 18% 0%, rgba(37,99,235,.16), transparent 60%),
+        radial-gradient(760px 520px at 86% 10%, rgba(20,184,166,.14), transparent 60%),
+        radial-gradient(900px 620px at 40% 105%, rgba(37,99,235,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    .wrap{ max-width: 920px; margin: 0 auto; }
+    .header{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(37,99,235,.95), rgba(20,184,166,.85));
+      box-shadow: 0 10px 26px rgba(15,23,42,.10);
+      position:relative; overflow:hidden;
+    }
+    .logo::after{
+      content:""; position:absolute; inset:-40%;
+      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.55), transparent 60%);
+      transform: rotate(20deg);
+      animation: shine 6.5s linear infinite;
+    }
+    @keyframes shine{
+      0%{ transform: translateX(-35%) rotate(20deg); opacity:.0; }
+      8%{ opacity:.65; }
+      40%{ opacity:.0; }
+      100%{ transform: translateX(35%) rotate(20deg); opacity:0; }
+    }
+    h1{ font-size: 20px; margin: 0; letter-spacing:.2px; }
+    .subtitle{ margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .pill{
+      font-size:12px; color: var(--muted);
+      padding: 8px 10px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.60);
+      border-radius: 999px;
+      box-shadow: 0 6px 16px rgba(15,23,42,.06);
+      backdrop-filter: blur(10px);
+    }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      backdrop-filter: blur(12px);
+    }
+
+    label{ display:block; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+    input[type="text"], input[type="number"], textarea{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.90);
+      color: var(--text);
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    input:focus, textarea:focus{
+      border-color: rgba(37,99,235,.45);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.14);
+    }
+    textarea{ min-height:110px; resize:vertical; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 760px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .row{ display:flex; gap:10px; align-items:stretch; flex-wrap:wrap; }
+
+    .btn{
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(37,99,235,.10);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
+      white-space: nowrap;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .btn:hover{
+      background: rgba(37,99,235,.14);
+      border-color: rgba(37,99,235,.26);
+      box-shadow: 0 10px 24px rgba(37,99,235,.10);
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn.secondary{ background: rgba(255,255,255,.70); }
+    .btn.secondary:hover{ background: rgba(255,255,255,.90); box-shadow: 0 10px 24px rgba(15,23,42,.08); }
+    .btn.success{ background: rgba(20,184,166,.12); border-color: rgba(20,184,166,.22); }
+    .btn.success:hover{ background: rgba(20,184,166,.16); box-shadow: 0 10px 24px rgba(20,184,166,.10); }
+    .btn.ghost{ background: transparent; }
+    .btn.small{ padding: 8px 10px; border-radius: 999px; font-weight: 750; font-size: 12px; }
+
+    .hint{ font-size: 12px; color: var(--muted2); margin-top: 6px; }
+    .required{ color: var(--accent2); font-weight:800; }
+
+    .section-title{ margin: 16px 0 10px; font-size: 13px; color: var(--muted); font-weight: 800; }
+
+    .cause-box{
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.60);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 10px 26px rgba(15,23,42,.06);
+    }
+    .cause-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+    .chip{
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.88);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 750;
+      font-size: 13px;
+      transition: background .15s ease, border-color .15s ease, transform .06s ease, box-shadow .15s ease;
+      user-select: none;
+    }
+    .chip:hover{ background: rgba(255,255,255,.98); box-shadow: 0 10px 18px rgba(15,23,42,.08); }
+    .chip:active{ transform: translateY(1px); }
+    .chip.active{
+      background: rgba(37,99,235,.12);
+      border-color: rgba(37,99,235,.35);
+      box-shadow: 0 10px 22px rgba(37,99,235,.12);
+    }
+    .cause-actions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    .footer{ display:flex; gap:10px; justify-content:flex-end; margin-top: 16px; flex-wrap:wrap; }
+
+    .status{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px dashed rgba(15,23,42,.18);
+      background: rgba(255,255,255,.55);
+    }
+    .status.ok{ border-style:solid; border-color: rgba(20,184,166,.28); }
+    .status.err{ border-style:solid; border-color: rgba(239,68,68,.30); }
+
+    /* Recent names pills */
+    .recent-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top: 8px;
+      align-items:center;
+    }
+    .recent-label{ font-size: 12px; color: var(--muted2); margin-right: 4px; }
+
+    /* Downtime helper */
+    .downtime-tools{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top: 8px;
+    }
+    .downtime-pill{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.65);
+    }
+    input[type="range"]{
+      width: min(420px, 100%);
+      accent-color: var(--accent);
+    }
+
+    /* Scanner dialog */
+    dialog{
+      border: 1px solid rgba(15,23,42,.14);
+      border-radius: 18px;
+      background: rgba(255,255,255,.94);
+      color: var(--text);
+      width: min(860px, 96vw);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      backdrop-filter: blur(12px);
+    }
+    dialog::backdrop{ background: rgba(2, 6, 23, .55); }
+    .scan-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .scan-title{ margin:0; font-size:16px; }
+    .videoWrap{
+      position:relative;
+      border-radius: 16px;
+      overflow:hidden;
+      border: 1px solid rgba(15,23,42,.14);
+      background:#000;
+      min-height: 220px;
+    }
+    video{ width:100%; display:block; background:#000; }
+    .overlay{
+      position:absolute; inset:0; pointer-events:none;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .frame{
+      width:min(420px, 78%);
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,.65);
+      box-shadow: 0 0 0 9999px rgba(0,0,0,.28);
+      position:relative;
+      overflow:hidden;
+    }
+    .scanLine{
+      position:absolute; left:10%; right:10%;
+      height:2px;
+      background: rgba(20,184,166,.95);
+      top:12%;
+      box-shadow: 0 0 18px rgba(20,184,166,.70);
+      animation: scan 1.35s ease-in-out infinite;
+    }
+    @keyframes scan{
+      0%{ top: 14%; opacity:.45; }
+      50%{ top: 84%; opacity:1; }
+      100%{ top: 14%; opacity:.45; }
+    }
+    .scan-footer{
+      display:flex; gap:10px; justify-content:space-between; margin-top:12px;
+      flex-wrap:wrap; align-items:center;
+    }
+    .scanStatus{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.65);
+      max-width: 100%;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.75);
+      color: rgba(11,19,36,.85);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Plus Pack – Forhindringslog</h1>
+          <p class="subtitle">Registrér forhindringer / nedetid hurtigt og ensartet.</p>
+        </div>
+      </div>
+      <div class="pill" id="today"></div>
+    </div>
+
+    <form class="card" id="hindranceForm">
+      <!-- Ordre nr + QR -->
+      <div>
+        <label for="orderNo">Ordre nr (QR) <span class="required">*</span></label>
+        <div class="row">
+          <input id="orderNo" name="orderNo" type="text" placeholder="Scan QR eller indtast ordre nr..." autocomplete="off" required />
+          <button type="button" class="btn" id="scanBtn" aria-haspopup="dialog" aria-controls="scanDialog">
+            <span aria-hidden="true">📷</span> Scan QR
+          </button>
+        </div>
+        <div class="hint">Krav: HTTPS/localhost + kamera-tilladelse. Bedst på mobil i Chrome/Edge.</div>
+      </div>
+
+      <div class="grid" style="margin-top:14px;">
+        <!-- Navn + seneste -->
+        <div>
+          <label for="name">Navn <span class="required">*</span></label>
+          <input id="name" name="name" type="text" placeholder="Dit navn..." required />
+
+          <div class="recent-row" id="recentNamesRow" style="display:none;">
+            <span class="recent-label">Seneste:</span>
+            <div id="recentNames" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+            <button type="button" class="btn ghost small" id="clearNamesBtn" title="Ryd gemte navne">Ryd</button>
+          </div>
+
+          <div class="hint">Tip: Efter “Send registrering” gemmes navnet automatisk som genvej (max 5).</div>
+        </div>
+
+        <!-- Nedetid (manual + nem) -->
+        <div>
+          <label for="downtimeMin">Nedetid (minutter) <span class="required">*</span></label>
+          <input id="downtimeMin" name="downtimeMin" type="number" min="0" step="1" placeholder="0" required />
+
+          <div class="downtime-tools">
+            <button type="button" class="btn secondary small" id="minus5">− 5</button>
+            <button type="button" class="btn secondary small" id="plus5">+ 5</button>
+            <span class="downtime-pill">5 min interval</span>
+          </div>
+
+          <div class="downtime-tools">
+            <input id="downtimeRange" type="range" min="0" max="240" step="5" value="0" />
+            <span class="downtime-pill" id="rangeLabel">0 min</span>
+          </div>
+
+          <div class="hint">Du kan stadig skrive manuelt. Slider/knapper hjælper med hurtig 5-min justering.</div>
+        </div>
+      </div>
+
+      <!-- Årsager -->
+      <div class="section-title">Årsag <span class="required">*</span></div>
+      <div class="cause-box">
+        <div class="cause-grid" id="topCauses"></div>
+
+        <div id="moreCausesWrap" style="display:none; margin-top:10px;">
+          <div class="cause-grid" id="moreCauses"></div>
+        </div>
+
+        <div class="cause-actions">
+          <div class="pill">Valgt: <span id="selectedCauseLabel">Ingen</span></div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn secondary" id="toggleMoreBtn">Vis flere</button>
+            <button type="button" class="btn ghost" id="clearCauseBtn">Ryd valg</button>
+          </div>
+        </div>
+
+        <input type="hidden" id="selectedCause" name="selectedCause" required />
+      </div>
+
+      <div class="grid" style="margin-top:14px;">
+        <div>
+          <label for="causeDetails">Uddybende årsag</label>
+          <textarea id="causeDetails" name="causeDetails" placeholder="Beskriv kort hvad der skete..."></textarea>
+        </div>
+
+        <div>
+          <label for="actionsTaken">Hvad har du gjort?</label>
+          <textarea id="actionsTaken" name="actionsTaken" placeholder="Hvilke handlinger/tiltag blev gjort?"></textarea>
+        </div>
+      </div>
+
+      <div class="footer">
+        <button type="reset" class="btn secondary">Nulstil</button>
+        <button type="submit" class="btn success">Send registrering</button>
+      </div>
+
+      <div class="status" id="formStatus" aria-live="polite"></div>
+    </form>
+
+    <!-- Scanner dialog -->
+    <dialog id="scanDialog">
+      <div class="scan-head">
+        <h2 class="scan-title">Scan QR-kode</h2>
+        <button type="button" class="btn secondary" id="closeScanBtn">Luk <span class="kbd">Esc</span></button>
+      </div>
+
+      <div class="videoWrap">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="overlay" aria-hidden="true">
+          <div class="frame">
+            <div class="scanLine"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scan-footer">
+        <div class="scanStatus" id="scanStatus">Klar…</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+          <button type="button" class="btn secondary" id="torchBtn" style="display:none;">🔦 Lys</button>
+          <button type="button" class="btn secondary" id="stopScanBtn">Stop</button>
+        </div>
+      </div>
+    </dialog>
+  </div>
+
+  <script>
+    // Dato i toppen
+    (function(){
+      const el = document.getElementById('today');
+      const d = new Date();
+      el.textContent = d.toLocaleString('da-DK', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    })();
+
+    // ===================== ÅRSAGER =====================
+    const TOP_5_CAUSES = ["Mekanisk fejl","Materialemangel","Kvalitetsstop","Værktøj/fixture","IT/System"];
+    const OTHER_CAUSES = ["Skift / omstilling","Mandskab / bemanding","Sikkerhed / HSE","Rengøring / 5S","Planlægning / prioritering","Vedligehold (planlagt)","Vedligehold (akut)","Andet"];
+
+    const selectedCauseInput = document.getElementById('selectedCause');
+    const selectedCauseLabel = document.getElementById('selectedCauseLabel');
+    const topCausesEl = document.getElementById('topCauses');
+    const moreCausesEl = document.getElementById('moreCauses');
+    const moreCausesWrap = document.getElementById('moreCausesWrap');
+    const toggleMoreBtn = document.getElementById('toggleMoreBtn');
+    const clearCauseBtn = document.getElementById('clearCauseBtn');
+
+    function createChip(text){
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "chip";
+      btn.textContent = text;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.chip.active').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCauseInput.value = text;
+        selectedCauseLabel.textContent = text;
+      });
+      return btn;
+    }
+    TOP_5_CAUSES.forEach(c => topCausesEl.appendChild(createChip(c)));
+    OTHER_CAUSES.forEach(c => moreCausesEl.appendChild(createChip(c)));
+
+    toggleMoreBtn.addEventListener('click', () => {
+      const isOpen = moreCausesWrap.style.display !== 'none';
+      moreCausesWrap.style.display = isOpen ? 'none' : 'block';
+      toggleMoreBtn.textContent = isOpen ? 'Vis flere' : 'Skjul ekstra';
+    });
+
+    clearCauseBtn.addEventListener('click', () => {
+      document.querySelectorAll('.chip.active').forEach(x => x.classList.remove('active'));
+      selectedCauseInput.value = "";
+      selectedCauseLabel.textContent = "Ingen";
+    });
+
+    // ===================== STATUS / SUBMIT =====================
+    const form = document.getElementById('hindranceForm');
+    const statusEl = document.getElementById('formStatus');
+    function setFormStatus(text, type){
+      statusEl.textContent = text || "";
+      statusEl.classList.remove('ok','err');
+      if(type === 'ok') statusEl.classList.add('ok');
+      if(type === 'err') statusEl.classList.add('err');
+    }
+
+    // ===================== RECENT NAMES (MAX 5) =====================
+    const nameEl = document.getElementById('name');
+    const recentRow = document.getElementById('recentNamesRow');
+    const recentNamesWrap = document.getElementById('recentNames');
+    const clearNamesBtn = document.getElementById('clearNamesBtn');
+
+    const NAMES_KEY = "pluspack_recent_names_v1";
+    function loadNames(){
+      try{
+        const raw = localStorage.getItem(NAMES_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch(_){ return []; }
+    }
+    function saveNames(arr){
+      localStorage.setItem(NAMES_KEY, JSON.stringify(arr.slice(0,5)));
+    }
+
+    function renderRecentNames(){
+      const names = loadNames();
+      recentNamesWrap.innerHTML = "";
+
+      if(!names.length){
+        recentRow.style.display = "none";
+        return;
+      }
+
+      names.forEach(n => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "btn secondary small";
+        b.textContent = n;
+        b.addEventListener("click", () => {
+          nameEl.value = n;
+          nameEl.focus();
+        });
+        recentNamesWrap.appendChild(b);
+      });
+
+      recentRow.style.display = "flex";
+    }
+
+    function addRecentName(name){
+      const clean = (name || "").trim();
+      if(!clean) return;
+      let names = loadNames();
+
+      // fjern hvis findes (case-insensitive), og sæt forrest
+      names = names.filter(x => String(x).toLowerCase() !== clean.toLowerCase());
+      names.unshift(clean);
+
+      saveNames(names);
+      renderRecentNames();
+    }
+
+    clearNamesBtn.addEventListener("click", () => {
+      localStorage.removeItem(NAMES_KEY);
+      renderRecentNames();
+    });
+
+    renderRecentNames();
+
+    // ===================== DOWNTIME QUICK CONTROL (5-min) =====================
+    const downtimeEl = document.getElementById('downtimeMin');
+    const rangeEl = document.getElementById('downtimeRange');
+    const rangeLabel = document.getElementById('rangeLabel');
+    const minus5 = document.getElementById('minus5');
+    const plus5  = document.getElementById('plus5');
+
+    const RANGE_MAX = 240; // 0-240 min (4 timer). Ret hvis du vil.
+    rangeEl.max = String(RANGE_MAX);
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+    function toNum(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+    function roundTo5(n){
+      return Math.round(n / 5) * 5;
+    }
+
+    function setDowntime(n, source){
+      // source: "range" | "input" | "buttons"
+      const val = clamp(Math.max(0, Math.round(n)), 0, RANGE_MAX);
+      downtimeEl.value = String(val);
+
+      // range skal køre i 5-min steps (nærmeste)
+      const r = clamp(roundTo5(val), 0, RANGE_MAX);
+      rangeEl.value = String(r);
+      rangeLabel.textContent = r + " min";
+    }
+
+    // Start sync
+    setDowntime(toNum(downtimeEl.value || 0), "init");
+
+    // slider -> input
+    rangeEl.addEventListener("input", () => {
+      setDowntime(toNum(rangeEl.value), "range");
+    });
+
+    // input typing -> range (snap to nearest 5 visually)
+    downtimeEl.addEventListener("input", () => {
+      setDowntime(toNum(downtimeEl.value), "input");
+    });
+
+    // buttons +/-5
+    minus5.addEventListener("click", () => setDowntime(toNum(downtimeEl.value) - 5, "buttons"));
+    plus5.addEventListener("click",  () => setDowntime(toNum(downtimeEl.value) + 5, "buttons"));
+
+    // ===================== SUBMIT (DEMO) =====================
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if(!selectedCauseInput.value){
+        setFormStatus("Vælg venligst en årsag.", "err");
+        return;
+      }
+
+      const payload = {
+        orderNo: document.getElementById('orderNo').value.trim(),
+        name: nameEl.value.trim(),
+        downtimeMin: Number(downtimeEl.value),
+        cause: selectedCauseInput.value,
+        causeDetails: document.getElementById('causeDetails').value.trim(),
+        actionsTaken: document.getElementById('actionsTaken').value.trim(),
+        createdAt: new Date().toISOString()
+      };
+
+      // Gem navn som genvej
+      addRecentName(payload.name);
+
+      setFormStatus("Registrering klar til afsendelse (demo). Se data i konsollen.", "ok");
+      console.log("Payload:", payload);
+    });
+
+    // ================= QR SCANNER (robust + fallback) =================
+    const scanBtn = document.getElementById('scanBtn');
+    const scanDialog = document.getElementById('scanDialog');
+    const closeScanBtn = document.getElementById('closeScanBtn');
+    const stopScanBtn = document.getElementById('stopScanBtn');
+    const torchBtn = document.getElementById('torchBtn');
+
+    const video = document.getElementById('video');
+    const scanStatus = document.getElementById('scanStatus');
+    const orderNoEl = document.getElementById('orderNo');
+
+    let stream = null;
+    let streamTrack = null;
+    let scanning = false;
+    let lockResult = false;
+    let torchOn = false;
+
+    function setScanStatus(msg){ scanStatus.textContent = msg; }
+    function isSecureOK(){
+      return window.isSecureContext || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    }
+
+    async function startCamera(){
+      const constraints = {
+        audio: false,
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      video.srcObject = stream;
+      await video.play();
+
+      streamTrack = stream.getVideoTracks?.()[0] || null;
+      torchBtn.style.display = "none";
+      torchOn = false;
+
+      if(streamTrack && typeof streamTrack.getCapabilities === "function"){
+        const caps = streamTrack.getCapabilities();
+        if(caps && caps.torch){
+          torchBtn.style.display = "inline-flex";
+          torchBtn.textContent = "🔦 Lys";
+        }
+      }
+    }
+
+    async function setTorch(enabled){
+      if(!streamTrack) return;
+      try{
+        await streamTrack.applyConstraints({ advanced: [{ torch: !!enabled }] });
+        torchOn = !!enabled;
+        torchBtn.textContent = torchOn ? "🔦 Lys (ON)" : "🔦 Lys";
+      }catch(e){
+        setScanStatus("Lys ikke tilgængelig på denne enhed.");
+        torchBtn.style.display = "none";
+      }
+    }
+
+    function stopCamera(){
+      try{
+        if(stream){
+          stream.getTracks().forEach(t => t.stop());
+        }
+      }catch(_){}
+      stream = null;
+      streamTrack = null;
+      video.srcObject = null;
+      scanning = false;
+      lockResult = false;
+      torchOn = false;
+      torchBtn.style.display = "none";
+    }
+
+    async function scanWithBarcodeDetector(){
+      if(!('BarcodeDetector' in window)) return false;
+
+      const detector = new BarcodeDetector({ formats: ["qr_code"] });
+      scanning = true;
+      setScanStatus("Scanner (native)… Peg mod QR-koden");
+
+      const loop = async () => {
+        if(!scanning) return;
+        try{
+          if(video.readyState >= 2){
+            const codes = await detector.detect(video);
+            if(!lockResult && codes && codes.length){
+              const val = String(codes[0].rawValue || "").trim();
+              if(val){
+                lockResult = true;
+                foundResult(val);
+                return;
+              }
+            }
+          }
+        }catch(err){
+          setScanStatus("Scan-fejl (native): " + (err?.message || err));
+        }
+        setTimeout(loop, 90);
+      };
+      loop();
+      return true;
+    }
+
+    async function scanWithZXing(){
+      const mod = await import("https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/+esm");
+      const { BrowserQRCodeReader, BrowserCodeReader } = mod;
+
+      const codeReader = new BrowserQRCodeReader();
+      scanning = true;
+      setScanStatus("Scanner (ZXing)… Peg mod QR-koden");
+
+      const devices = await BrowserCodeReader.listVideoInputDevices();
+      let preferredDeviceId = devices?.[0]?.deviceId;
+      const back = (devices || []).find(d => /back|rear|environment/i.test(d.label || ""));
+      if(back?.deviceId) preferredDeviceId = back.deviceId;
+
+      const controls = await codeReader.decodeFromVideoDevice(preferredDeviceId, video, (result) => {
+        if(!scanning || lockResult) return;
+        if(result){
+          const val = String(result.getText() || "").trim();
+          if(val){
+            lockResult = true;
+            try{ controls.stop(); }catch(_){}
+            foundResult(val);
+          }
+        }
+      });
+
+      return true;
+    }
+
+    function foundResult(val){
+      orderNoEl.value = val;
+      setScanStatus("Fundet: " + val);
+      setTimeout(() => {
+        scanning = false;
+        stopCamera();
+        if(scanDialog.open) scanDialog.close();
+        orderNoEl.focus();
+      }, 450);
+    }
+
+    async function openScanner(){
+      lockResult = false;
+      scanDialog.showModal();
+
+      if(!isSecureOK()){
+        setScanStatus("Kamera kræver HTTPS eller localhost.");
+        return;
+      }
+      if(!navigator.mediaDevices?.getUserMedia){
+        setScanStatus("Kamera ikke tilgængeligt i denne browser. Indtast manuelt.");
+        return;
+      }
+
+      try{
+        setScanStatus("Starter kamera…");
+        await startCamera();
+
+        try{
+          await scanWithZXing();
+          return;
+        }catch(e){
+          console.warn("ZXing failed:", e);
+        }
+
+        const ok = await scanWithBarcodeDetector();
+        if(!ok){
+          setScanStatus("Scanner kan ikke starte. Brug Chrome/Edge eller indtast manuelt.");
+        }
+      }catch(err){
+        const name = err?.name || "";
+        if(name === "NotAllowedError") setScanStatus("Kamera-tilladelse afvist. Tillad kamera i browseren og prøv igen.");
+        else if(name === "NotFoundError") setScanStatus("Ingen kamera fundet på enheden.");
+        else if(name === "NotReadableError") setScanStatus("Kamera er optaget af en anden app. Luk andre kamera-apps og prøv igen.");
+        else setScanStatus("Kunne ikke åbne kamera: " + (err?.message || err));
+        stopCamera();
+      }
+    }
+
+    function closeScanner(){
+      scanning = false;
+      stopCamera();
+      if(scanDialog.open) scanDialog.close();
+    }
+
+    scanBtn.addEventListener('click', openScanner);
+    closeScanBtn.addEventListener('click', closeScanner);
+    stopScanBtn.addEventListener('click', closeScanner);
+    torchBtn.addEventListener('click', async () => { await setTorch(!torchOn); });
+
+    scanDialog.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeScanner();
+    });
+  </script>
+</body>
+</html>
