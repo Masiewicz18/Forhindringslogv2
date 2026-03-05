@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plus Pack – Forhindringslog (QR)</title>
+  <title>Plus Pack – Forhindringslog (QR + DataMatrix)</title>
 
   <style>
     :root{
@@ -170,34 +170,21 @@
 
     /* Recent names pills */
     .recent-row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top: 8px;
-      align-items:center;
+      display:flex; gap:8px; flex-wrap:wrap; margin-top: 8px; align-items:center;
     }
     .recent-label{ font-size: 12px; color: var(--muted2); margin-right: 4px; }
 
     /* Downtime helper */
     .downtime-tools{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-top: 8px;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top: 8px;
     }
     .downtime-pill{
-      font-size: 12px;
-      color: var(--muted);
-      padding: 7px 10px;
-      border-radius: 999px;
+      font-size: 12px; color: var(--muted);
+      padding: 7px 10px; border-radius: 999px;
       border: 1px solid rgba(15,23,42,.10);
       background: rgba(255,255,255,.65);
     }
-    input[type="range"]{
-      width: min(420px, 100%);
-      accent-color: var(--accent);
-    }
+    input[type="range"]{ width: min(460px, 100%); accent-color: var(--accent); }
 
     /* Scanner dialog */
     dialog{
@@ -214,12 +201,9 @@
     .scan-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
     .scan-title{ margin:0; font-size:16px; }
     .videoWrap{
-      position:relative;
-      border-radius: 16px;
-      overflow:hidden;
+      position:relative; border-radius: 16px; overflow:hidden;
       border: 1px solid rgba(15,23,42,.14);
-      background:#000;
-      min-height: 220px;
+      background:#000; min-height: 220px;
     }
     video{ width:100%; display:block; background:#000; }
     .overlay{
@@ -232,8 +216,7 @@
       border-radius: 18px;
       border: 2px solid rgba(255,255,255,.65);
       box-shadow: 0 0 0 9999px rgba(0,0,0,.28);
-      position:relative;
-      overflow:hidden;
+      position:relative; overflow:hidden;
     }
     .scanLine{
       position:absolute; left:10%; right:10%;
@@ -253,8 +236,7 @@
       flex-wrap:wrap; align-items:center;
     }
     .scanStatus{
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 12px; color: var(--muted);
       padding: 8px 10px;
       border-radius: 999px;
       border: 1px solid rgba(15,23,42,.10);
@@ -287,16 +269,16 @@
     </div>
 
     <form class="card" id="hindranceForm">
-      <!-- Ordre nr + QR -->
+      <!-- Ordre nr + scan -->
       <div>
-        <label for="orderNo">Ordre nr (QR) <span class="required">*</span></label>
+        <label for="orderNo">Ordre nr (QR / DataMatrix) <span class="required">*</span></label>
         <div class="row">
-          <input id="orderNo" name="orderNo" type="text" placeholder="Scan QR eller indtast ordre nr..." autocomplete="off" required />
+          <input id="orderNo" name="orderNo" type="text" placeholder="Scan kode eller indtast..." autocomplete="off" required />
           <button type="button" class="btn" id="scanBtn" aria-haspopup="dialog" aria-controls="scanDialog">
-            <span aria-hidden="true">📷</span> Scan QR
+            <span aria-hidden="true">📷</span> Scan
           </button>
         </div>
-        <div class="hint">Krav: HTTPS/localhost + kamera-tilladelse. Bedst på mobil i Chrome/Edge.</div>
+        <div class="hint">Scanner: QR + DataMatrix. Krav: HTTPS/localhost + kamera-tilladelse.</div>
       </div>
 
       <div class="grid" style="margin-top:14px;">
@@ -311,10 +293,10 @@
             <button type="button" class="btn ghost small" id="clearNamesBtn" title="Ryd gemte navne">Ryd</button>
           </div>
 
-          <div class="hint">Tip: Efter “Send registrering” gemmes navnet automatisk som genvej (max 5).</div>
+          <div class="hint">Efter “Send registrering” gemmes navnet automatisk (max 5).</div>
         </div>
 
-        <!-- Nedetid (manual + nem) -->
+        <!-- Nedetid -->
         <div>
           <label for="downtimeMin">Nedetid (minutter) <span class="required">*</span></label>
           <input id="downtimeMin" name="downtimeMin" type="number" min="0" step="1" placeholder="0" required />
@@ -326,11 +308,11 @@
           </div>
 
           <div class="downtime-tools">
-            <input id="downtimeRange" type="range" min="0" max="240" step="5" value="0" />
+            <input id="downtimeRange" type="range" min="0" max="480" step="5" value="0" />
             <span class="downtime-pill" id="rangeLabel">0 min</span>
           </div>
 
-          <div class="hint">Du kan stadig skrive manuelt. Slider/knapper hjælper med hurtig 5-min justering.</div>
+          <div class="hint">Slider/knapper kører 5-min intervaller. Du kan stadig skrive manuelt.</div>
         </div>
       </div>
 
@@ -377,7 +359,7 @@
     <!-- Scanner dialog -->
     <dialog id="scanDialog">
       <div class="scan-head">
-        <h2 class="scan-title">Scan QR-kode</h2>
+        <h2 class="scan-title">Scan kode (QR / DataMatrix)</h2>
         <button type="button" class="btn secondary" id="closeScanBtn">Luk <span class="kbd">Esc</span></button>
       </div>
 
@@ -401,14 +383,14 @@
   </div>
 
   <script>
-    // Dato i toppen
+    // Dato
     (function(){
       const el = document.getElementById('today');
       const d = new Date();
       el.textContent = d.toLocaleString('da-DK', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
     })();
 
-    // ===================== ÅRSAGER =====================
+    // Årsager
     const TOP_5_CAUSES = ["Mekanisk fejl","Materialemangel","Kvalitetsstop","Værktøj/fixture","IT/System"];
     const OTHER_CAUSES = ["Skift / omstilling","Mandskab / bemanding","Sikkerhed / HSE","Rengøring / 5S","Planlægning / prioritering","Vedligehold (planlagt)","Vedligehold (akut)","Andet"];
 
@@ -441,14 +423,13 @@
       moreCausesWrap.style.display = isOpen ? 'none' : 'block';
       toggleMoreBtn.textContent = isOpen ? 'Vis flere' : 'Skjul ekstra';
     });
-
     clearCauseBtn.addEventListener('click', () => {
       document.querySelectorAll('.chip.active').forEach(x => x.classList.remove('active'));
       selectedCauseInput.value = "";
       selectedCauseLabel.textContent = "Ingen";
     });
 
-    // ===================== STATUS / SUBMIT =====================
+    // Status
     const form = document.getElementById('hindranceForm');
     const statusEl = document.getElementById('formStatus');
     function setFormStatus(text, type){
@@ -458,13 +439,13 @@
       if(type === 'err') statusEl.classList.add('err');
     }
 
-    // ===================== RECENT NAMES (MAX 5) =====================
+    // Recent names
     const nameEl = document.getElementById('name');
     const recentRow = document.getElementById('recentNamesRow');
     const recentNamesWrap = document.getElementById('recentNames');
     const clearNamesBtn = document.getElementById('clearNamesBtn');
-
     const NAMES_KEY = "pluspack_recent_names_v1";
+
     function loadNames(){
       try{
         const raw = localStorage.getItem(NAMES_KEY);
@@ -472,103 +453,67 @@
         return Array.isArray(arr) ? arr : [];
       }catch(_){ return []; }
     }
-    function saveNames(arr){
-      localStorage.setItem(NAMES_KEY, JSON.stringify(arr.slice(0,5)));
-    }
-
+    function saveNames(arr){ localStorage.setItem(NAMES_KEY, JSON.stringify(arr.slice(0,5))); }
     function renderRecentNames(){
       const names = loadNames();
       recentNamesWrap.innerHTML = "";
-
-      if(!names.length){
-        recentRow.style.display = "none";
-        return;
-      }
-
+      if(!names.length){ recentRow.style.display = "none"; return; }
       names.forEach(n => {
         const b = document.createElement("button");
         b.type = "button";
         b.className = "btn secondary small";
         b.textContent = n;
-        b.addEventListener("click", () => {
-          nameEl.value = n;
-          nameEl.focus();
-        });
+        b.addEventListener("click", () => { nameEl.value = n; nameEl.focus(); });
         recentNamesWrap.appendChild(b);
       });
-
       recentRow.style.display = "flex";
     }
-
     function addRecentName(name){
       const clean = (name || "").trim();
       if(!clean) return;
       let names = loadNames();
-
-      // fjern hvis findes (case-insensitive), og sæt forrest
       names = names.filter(x => String(x).toLowerCase() !== clean.toLowerCase());
       names.unshift(clean);
-
       saveNames(names);
       renderRecentNames();
     }
-
     clearNamesBtn.addEventListener("click", () => {
       localStorage.removeItem(NAMES_KEY);
       renderRecentNames();
     });
-
     renderRecentNames();
 
-    // ===================== DOWNTIME QUICK CONTROL (5-min) =====================
+    // Downtime 5-min tools (max 480 min = 8 timer)
     const downtimeEl = document.getElementById('downtimeMin');
     const rangeEl = document.getElementById('downtimeRange');
     const rangeLabel = document.getElementById('rangeLabel');
     const minus5 = document.getElementById('minus5');
     const plus5  = document.getElementById('plus5');
+    const RANGE_MAX = 480;
 
-    const RANGE_MAX = 240; // 0-240 min (4 timer). Ret hvis du vil.
     rangeEl.max = String(RANGE_MAX);
 
     function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
     function toNum(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+    function roundTo5(n){ return Math.round(n / 5) * 5; }
 
-    function roundTo5(n){
-      return Math.round(n / 5) * 5;
-    }
-
-    function setDowntime(n, source){
-      // source: "range" | "input" | "buttons"
+    function setDowntime(n){
       const val = clamp(Math.max(0, Math.round(n)), 0, RANGE_MAX);
       downtimeEl.value = String(val);
-
-      // range skal køre i 5-min steps (nærmeste)
       const r = clamp(roundTo5(val), 0, RANGE_MAX);
       rangeEl.value = String(r);
       rangeLabel.textContent = r + " min";
     }
 
-    // Start sync
-    setDowntime(toNum(downtimeEl.value || 0), "init");
+    setDowntime(toNum(downtimeEl.value || 0));
+    rangeEl.addEventListener("input", () => setDowntime(toNum(rangeEl.value)));
+    downtimeEl.addEventListener("input", () => setDowntime(toNum(downtimeEl.value)));
+    minus5.addEventListener("click", () => setDowntime(toNum(downtimeEl.value) - 5));
+    plus5.addEventListener("click",  () => setDowntime(toNum(downtimeEl.value) + 5));
 
-    // slider -> input
-    rangeEl.addEventListener("input", () => {
-      setDowntime(toNum(rangeEl.value), "range");
-    });
-
-    // input typing -> range (snap to nearest 5 visually)
-    downtimeEl.addEventListener("input", () => {
-      setDowntime(toNum(downtimeEl.value), "input");
-    });
-
-    // buttons +/-5
-    minus5.addEventListener("click", () => setDowntime(toNum(downtimeEl.value) - 5, "buttons"));
-    plus5.addEventListener("click",  () => setDowntime(toNum(downtimeEl.value) + 5, "buttons"));
-
-    // ===================== SUBMIT (DEMO) =====================
+    // Submit demo
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-
       if(!selectedCauseInput.value){
         setFormStatus("Vælg venligst en årsag.", "err");
         return;
@@ -584,14 +529,12 @@
         createdAt: new Date().toISOString()
       };
 
-      // Gem navn som genvej
       addRecentName(payload.name);
-
       setFormStatus("Registrering klar til afsendelse (demo). Se data i konsollen.", "ok");
       console.log("Payload:", payload);
     });
 
-    // ================= QR SCANNER (robust + fallback) =================
+    // ================= SCANNER (ZXing multi-format + native fallback) =================
     const scanBtn = document.getElementById('scanBtn');
     const scanDialog = document.getElementById('scanDialog');
     const closeScanBtn = document.getElementById('closeScanBtn');
@@ -666,12 +609,15 @@
       torchBtn.style.display = "none";
     }
 
+    // Native BarcodeDetector fallback (QR + DataMatrix)
     async function scanWithBarcodeDetector(){
       if(!('BarcodeDetector' in window)) return false;
 
-      const detector = new BarcodeDetector({ formats: ["qr_code"] });
+      // VIGTIGT: inkluder data_matrix
+      const detector = new BarcodeDetector({ formats: ["qr_code","data_matrix"] });
+
       scanning = true;
-      setScanStatus("Scanner (native)… Peg mod QR-koden");
+      setScanStatus("Scanner (native)… QR + DataMatrix");
 
       const loop = async () => {
         if(!scanning) return;
@@ -696,20 +642,21 @@
       return true;
     }
 
-    async function scanWithZXing(){
+    // ZXing multi-format (QR + DataMatrix + stregkoder)
+    async function scanWithZXingMulti(){
       const mod = await import("https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/+esm");
-      const { BrowserQRCodeReader, BrowserCodeReader } = mod;
+      const { BrowserMultiFormatReader, BrowserCodeReader } = mod;
 
-      const codeReader = new BrowserQRCodeReader();
+      const reader = new BrowserMultiFormatReader();
       scanning = true;
-      setScanStatus("Scanner (ZXing)… Peg mod QR-koden");
+      setScanStatus("Scanner (ZXing)… QR + DataMatrix");
 
       const devices = await BrowserCodeReader.listVideoInputDevices();
       let preferredDeviceId = devices?.[0]?.deviceId;
       const back = (devices || []).find(d => /back|rear|environment/i.test(d.label || ""));
       if(back?.deviceId) preferredDeviceId = back.deviceId;
 
-      const controls = await codeReader.decodeFromVideoDevice(preferredDeviceId, video, (result) => {
+      const controls = await reader.decodeFromVideoDevice(preferredDeviceId, video, (result) => {
         if(!scanning || lockResult) return;
         if(result){
           const val = String(result.getText() || "").trim();
@@ -752,13 +699,15 @@
         setScanStatus("Starter kamera…");
         await startCamera();
 
+        // 1) ZXing multi-format (bedst)
         try{
-          await scanWithZXing();
+          await scanWithZXingMulti();
           return;
         }catch(e){
-          console.warn("ZXing failed:", e);
+          console.warn("ZXing multi failed:", e);
         }
 
+        // 2) Native fallback (QR + DataMatrix)
         const ok = await scanWithBarcodeDetector();
         if(!ok){
           setScanStatus("Scanner kan ikke starte. Brug Chrome/Edge eller indtast manuelt.");
